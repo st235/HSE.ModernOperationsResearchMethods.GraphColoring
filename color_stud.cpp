@@ -7,31 +7,106 @@
 #include <sstream>
 #include <random>
 #include <unordered_set>
+#include <set>
 #include <time.h>
 
 namespace {
 
+double RoundTo(double value, double precision = 1.0)
+{
+    return std::round(value / precision) * precision;
+}
+
+//  This is DSatur implementation.
+//
+//  It uses the same greedy technique to color vertices
+//  with the smallest possible color value. If it fails
+//  it initialises new color.
+//  Heuristic for vertices ordering is a vertex saturation.
+//  Saturation is a number characterising amount of different colors
+//  in the local neighbourhood, ie within the adjacent vertices.
+//
+//  A small heads-up: I will use Google's C++ Code Style
+//  and will refactor the code according to it:
+//  https://google.github.io/styleguide/cppguide.html
 class ColoringProblem {
 private:
-    static constexpr uint32_t INITIAL_COLOR = 1U;
+    static constexpr int32_t kColorNoColor = -1;
+    static constexpr int32_t kColorInitial = 1;
 
-    std::vector<uint32_t> _colors;
-    uint32_t _maxcolor = INITIAL_COLOR;
-    std::vector<std::unordered_set<int>> _neighbour_sets;
+    struct Node {
+    public:
+        uint32_t id;
+        uint32_t saturation;
+        uint32_t uncolored_neighborhood_degree;
 
-public:
-    int GetRandom(int a, int b) {
+        Node(uint32_t id, uint32_t saturation, uint32_t uncolored_neighborhood_degree):
+            id(id),
+            saturation(saturation),
+            uncolored_neighborhood_degree(uncolored_neighborhood_degree) {
+            // empty on purpose
+        }
+
+        Node(const Node& that):
+            id(that.id),
+            saturation(that.saturation),
+            uncolored_neighborhood_degree(that.uncolored_neighborhood_degree) {
+            // empty on purpose
+        }
+
+        Node& operator=(const Node& that) {
+            if (this != &that) {
+                this->id = that.id;
+                this->saturation = that.saturation;
+                this->uncolored_neighborhood_degree = that.uncolored_neighborhood_degree;
+            }
+
+            return *this;
+        }
+    };
+
+    struct NodeSaturationComparator {
+    public:
+        bool operator()(const Node& lhs, const Node& rhs) const {
+            if (lhs.saturation == rhs.saturation) {
+                // should be strict comparison,
+                // otherwise set won't be able to find an equal element
+
+                if (lhs.uncolored_neighborhood_degree == rhs.uncolored_neighborhood_degree) {
+                    return lhs.id > rhs.id;
+                }
+
+                return lhs.uncolored_neighborhood_degree > rhs.uncolored_neighborhood_degree;
+            }
+
+            return lhs.saturation > rhs.saturation;
+        }
+    };
+
+    std::vector<int32_t> colors_;
+    uint32_t max_color_ = static_cast<uint32_t>(kColorInitial);
+    std::vector<std::unordered_set<uint32_t>> graph_;
+
+    static int GetRandom(int a, int b) {
         static std::mt19937 generator;
         std::uniform_int_distribution<int> uniform(a, b);
         return uniform(generator);
+    }
+
+public:
+    inline uint32_t GetNumberOfColors() {
+        return max_color_;
+    }
+
+    const inline std::vector<int32_t>& GetColors() {
+        return colors_;
     }
 
     void ReadGraphFile(const std::string& filename) {
         std::ifstream fin(filename);
         std::string line;
         int vertices = 0, edges = 0;
-        while (std::getline(fin, line))
-        {
+        while (std::getline(fin, line)) {
             // 'c' stands for comments,
             // therefore skipping
             if (line[0] == 'c') {
@@ -43,50 +118,91 @@ public:
             if (line[0] == 'p') {
                 std::string type;
                 line_input >> command >> type >> vertices >> edges;
-                _neighbour_sets.resize(vertices);
-                _colors.resize(vertices + 1);
+                graph_.resize(vertices);
+                colors_.resize(vertices + 1);
             } else {
                 int start, finish;
                 line_input >> command >> start >> finish;
                 // Edges in DIMACS file can be repeated, but it is not a problem for our sets
-                _neighbour_sets[start - 1].insert(finish - 1);
-                _neighbour_sets[finish - 1].insert(start - 1);
+                graph_[start - 1].insert(finish - 1);
+                graph_[finish - 1].insert(start - 1);
             }
         }
     }
 
     void GreedyGraphColoring() {
-        std::vector<int> uncolored_vertices(_neighbour_sets.size());
-        for (size_t i = 0; i < uncolored_vertices.size(); ++i) {
-            uncolored_vertices[i] = i;
+        std::set<Node, NodeSaturationComparator> queue;
+
+        std::vector<uint32_t> vertices_degrees(graph_.size());
+
+        std::vector<std::unordered_set<int32_t>> adjacent_colors(graph_.size());
+
+        for (size_t i = 0; i < graph_.size(); i++) {
+            const auto& adjacent_vertices = graph_[i];
+
+            // let's reset all colors to kColorNoColor
+            colors_[i] = kColorNoColor;
+            vertices_degrees[i] = adjacent_vertices.size();
+
+            queue.insert(Node(static_cast<uint32_t>(i) /* id */, 
+                              static_cast<uint32_t>(adjacent_colors[i].size()) /* saturation */,
+                              vertices_degrees[i] /* uncolored_neighborhood_degree */ ));
         }
 
-        while (! uncolored_vertices.empty()) {
-            int index = GetRandom(0, uncolored_vertices.size() - 1);
-            int vertex = uncolored_vertices[index];
-            int color = GetRandom(1, _maxcolor);
-            for (int neighbour : _neighbour_sets[vertex]) {
-                if (color == _colors[neighbour]) {
-                    color = ++_maxcolor;
+        while (!queue.empty()) {
+            const auto queue_iterator = queue.begin();
+            Node node = *queue_iterator;
+            queue.erase(queue_iterator);
+
+            int32_t current_color = kColorNoColor;
+            std::vector<bool> available_colors(colors_.size(), true);
+            for (const auto& neighbour: graph_[node.id]) {
+                int32_t color = colors_[neighbour];
+                if (color != kColorNoColor) {
+                    available_colors[color] = false;
+                }
+            }
+            for (size_t color = 0; color < available_colors.size(); color++) {
+                if (available_colors[color]) {
+                    current_color = color;
                     break;
                 }
             }
-            _colors[vertex] = color;
-            // Move the colored vertex to the end and pop it
-            std::swap(uncolored_vertices[uncolored_vertices.size() - 1], uncolored_vertices[index]);
-            uncolored_vertices.pop_back();
+
+            colors_[node.id] = current_color;
+            max_color_ = std::max(max_color_, static_cast<uint32_t>(current_color));
+
+            for (const auto& neighbour: graph_[node.id]) {
+                if (colors_[neighbour] != kColorNoColor) {
+                    continue;
+                }
+
+                Node old_neighbour_state(static_cast<uint32_t>(neighbour) /* id */, 
+                                         static_cast<uint32_t>(adjacent_colors[neighbour].size()) /* saturation */,
+                                         vertices_degrees[neighbour] /* uncolored_neighborhood_degree */ );
+
+                adjacent_colors[neighbour].insert(current_color);
+                vertices_degrees[neighbour] -= 1;
+                queue.erase(old_neighbour_state);
+
+                Node new_neighbour_state(static_cast<uint32_t>(neighbour) /* id */, 
+                                         static_cast<uint32_t>(adjacent_colors[neighbour].size()) /* saturation */,
+                                         vertices_degrees[neighbour] /* uncolored_neighborhood_degree */ );
+
+                queue.insert(new_neighbour_state);
+            }
         }
     }
 
     bool Check() {
-        for (size_t i = 0; i < _neighbour_sets.size(); ++i) {
-            if (_colors[i] == 0) {
+        for (size_t i = 0; i < graph_.size(); ++i) {
+            if (colors_[i] == kColorNoColor) {
                 std::cout << "Vertex " << i + 1 << " is not colored\n";
                 return false;
             }
 
-            for (int neighbour : _neighbour_sets[i]) {
-                if (_colors[neighbour] == _colors[i]) {
+            for (int neighbour : graph_[i]) {
+                if (colors_[neighbour] == colors_[i]) {
                     std::cout << "Neighbour vertices " << i + 1 << ", " << neighbour + 1 <<  " have the same color\n";
                     return false;
                 }
@@ -94,14 +210,6 @@ public:
         }
 
         return true;
-    }
-
-    int GetNumberOfColors() {
-        return _maxcolor;
-    }
-
-    const std::vector<uint32_t>& GetColors() {
-        return _colors;
     }
 };
 
@@ -126,8 +234,12 @@ int main() {
             fout << "*** WARNING: incorrect coloring: ***\n";
             std::cout << "*** WARNING: incorrect coloring: ***\n";
         }
-        fout << file << "; " << problem.GetNumberOfColors() << "; " << double(clock() - start) / 1000 << '\n';
-        std::cout << file << "; " << problem.GetNumberOfColors() << "; " << double(clock() - start) / 1000 << '\n';
+        clock_t end = clock();
+        clock_t ticks_diff = end - start;
+        double seconds_diff = RoundTo(double(ticks_diff) / CLOCKS_PER_SEC, 0.001);
+
+        fout << file << "; " << problem.GetNumberOfColors() << "; " << seconds_diff << '\n';
+        std::cout << file << "; " << problem.GetNumberOfColors() << "; " << seconds_diff << '\n';
     }
 
     fout.close();
