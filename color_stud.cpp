@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -12,8 +13,7 @@
 
 namespace {
 
-double RoundTo(double value, double precision = 1.0)
-{
+double RoundTo(double value, double precision = 1.0) {
     return std::round(value / precision) * precision;
 }
 
@@ -223,7 +223,10 @@ int main() {
 
     std::ofstream fout("color.csv");
     fout << "Instance; Colors; Time (sec)\n";
-    std::cout << "Instance; Colors; Time (sec)\n";
+    std::cout << std::setfill(' ') << std::setw(20) << "Instance" 
+              << std::setfill(' ') << std::setw(10) << "Colors"
+              << std::setfill(' ') << std::setw(15) << "Time, sec"
+              << std::endl;
 
     for (const auto& file: files) {
         ColoringProblem problem;
@@ -238,8 +241,12 @@ int main() {
         clock_t ticks_diff = end - start;
         double seconds_diff = RoundTo(double(ticks_diff) / CLOCKS_PER_SEC, 0.001);
 
-        fout << file << "; " << problem.GetNumberOfColors() << "; " << seconds_diff << '\n';
-        std::cout << file << "; " << problem.GetNumberOfColors() << "; " << seconds_diff << '\n';
+        fout << file << ";" << problem.GetNumberOfColors() << ";" << seconds_diff << std::endl;
+
+    std::cout << std::setfill(' ') << std::setw(20) << file
+              << std::setfill(' ') << std::setw(10) << problem.GetNumberOfColors()
+              << std::setfill(' ') << std::setw(15) << seconds_diff
+              << std::endl;
     }
 
     fout.close();
