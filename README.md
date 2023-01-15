@@ -3,12 +3,13 @@
 ## Build
 
 ```bash
-g++ -std=c++17 color_stud.cpp
+g++ -std=c++17 graph_colorization.cpp
 ```
 
 ## Algorithm
 
 I am using DSatur algorithm to colorize the graph.
+
 Algorithm uses greedy approach by considering the verticies
 in a specific order and assining to them the smallest available color
 not used in the local neighbourhood.

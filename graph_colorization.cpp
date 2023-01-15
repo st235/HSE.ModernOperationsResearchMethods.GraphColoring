@@ -1,15 +1,15 @@
 #include <algorithm>
 #include <cstdint>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <sstream>
 #include <random>
-#include <unordered_set>
 #include <set>
-#include <time.h>
+#include <sstream>
+#include <string>
+#include <time>
+#include <unordered_set>
+#include <vector>
 
 namespace {
 
@@ -86,12 +86,6 @@ private:
     std::vector<int32_t> colors_;
     uint32_t max_color_ = static_cast<uint32_t>(kColorInitial);
     std::vector<std::unordered_set<uint32_t>> graph_;
-
-    static int GetRandom(int a, int b) {
-        static std::mt19937 generator;
-        std::uniform_int_distribution<int> uniform(a, b);
-        return uniform(generator);
-    }
 
 public:
     inline uint32_t GetNumberOfColors() {
