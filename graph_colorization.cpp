@@ -7,7 +7,7 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <time>
+#include <time.h>
 #include <unordered_set>
 #include <vector>
 
