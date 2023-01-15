@@ -86,4 +86,5 @@ You will see the interface like the interface below:
 | ----- | ------- |
 |![Graph](./resources/anna.png)|![Colored](./resources/anna_colored.png)|
 |![Graph](./resources/huck.png)|![Colored](./resources/hucked_colored.png)|
+|![Graph](./resources/queen5.png)|![Colored](./resources/queen5_colored.png)|
 
