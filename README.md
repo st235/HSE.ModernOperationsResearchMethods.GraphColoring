@@ -32,16 +32,16 @@ Program report can be found in [`output_report.csv`](./output_report.csv)
             Instance    Colors      Time, sec
          myciel3.col         4              0
          myciel7.col         8          0.003
- latin_square_10.col         2              0
-         school1.col        17           0.02
-     school1_nsh.col        28          0.015
+ latin_square_10.col       130          0.383
+         school1.col        17          0.022
+     school1_nsh.col        28          0.016
       mulsol.i.1.col        49          0.005
       inithx.i.1.col        54          0.023
             anna.col        11          0.001
             huck.col        11              0
             jean.col        10              0
        miles1000.col        42          0.004
-       miles1500.col        73          0.006
+       miles1500.col        73          0.007
       fpsol2.i.1.col        65          0.015
         le450_5a.col        10          0.007
        le450_15b.col        17           0.01
