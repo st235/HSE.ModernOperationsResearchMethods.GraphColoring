@@ -17,6 +17,16 @@ double RoundTo(double value, double precision = 1.0) {
     return std::round(value / precision) * precision;
 }
 
+template<typename T>
+std::string ListToString(const std::vector<T>& vector, char delimiter = ' ') {
+    std::ostringstream os;
+    for (const auto& item: vector) {
+        os << item;
+        os << delimiter;
+    }
+    return os.str();
+}
+
 //  This is DSatur implementation.
 //
 //  It uses the same greedy technique to color vertices
@@ -89,7 +99,10 @@ private:
 
 public:
     inline uint32_t GetNumberOfColors() {
-        return max_color_;
+        // as max_color is the last seen color
+        // we need to add + 1 to count them
+        // as we start coloring them from 0
+        return max_color_ + 1;
     }
 
     const inline std::vector<int32_t>& GetColors() {
@@ -215,8 +228,10 @@ int main() {
         "fpsol2.i.1.col", "le450_5a.col", "le450_15b.col", "le450_25a.col", "games120.col",
         "queen11_11.col", "queen5_5.col" };
 
-    std::ofstream fout("color.csv");
-    fout << "Instance; Colors; Time (sec)\n";
+    std::ofstream output_report("output_report.csv");
+    std::ofstream colors_report("colors_report.txt");
+
+    output_report << "Instance; Colors; Time (sec)\n";
     std::cout << std::setfill(' ') << std::setw(20) << "Instance" 
               << std::setfill(' ') << std::setw(10) << "Colors"
               << std::setfill(' ') << std::setw(15) << "Time, sec"
@@ -228,21 +243,28 @@ int main() {
         clock_t start = clock();
         problem.GreedyGraphColoring();
         if (!problem.Check()) {
-            fout << "*** WARNING: incorrect coloring: ***\n";
-            std::cout << "*** WARNING: incorrect coloring: ***\n";
+            output_report << "*** WARNING: incorrect coloring: ***" << std::endl;
+            std::cout << "*** WARNING: incorrect coloring: ***" << std::endl;
         }
         clock_t end = clock();
         clock_t ticks_diff = end - start;
         double seconds_diff = RoundTo(double(ticks_diff) / CLOCKS_PER_SEC, 0.001);
 
-        fout << file << ";" << problem.GetNumberOfColors() << ";" << seconds_diff << std::endl;
+        colors_report << file << std::endl
+                      << ListToString(problem.GetColors()) << std::endl
+                      << std::endl;
 
-    std::cout << std::setfill(' ') << std::setw(20) << file
-              << std::setfill(' ') << std::setw(10) << problem.GetNumberOfColors()
-              << std::setfill(' ') << std::setw(15) << seconds_diff
-              << std::endl;
+        output_report << file << ";"
+                      << problem.GetNumberOfColors() << ";"
+                      << seconds_diff << std::endl;
+
+        std::cout << std::setfill(' ') << std::setw(20) << file
+                << std::setfill(' ') << std::setw(10) << problem.GetNumberOfColors()
+                << std::setfill(' ') << std::setw(15) << seconds_diff
+                << std::endl;
     }
 
-    fout.close();
+    colors_report.close();
+    output_report.close();
     return 0;
 }
