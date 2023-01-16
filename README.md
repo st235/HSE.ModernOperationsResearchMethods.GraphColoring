@@ -1,6 +1,6 @@
 # Graph Coloring
 
-This is an implementation of graph coloring problem.
+This is an implementation of [graph coloring](https://en.wikipedia.org/wiki/Graph_coloring) problem.
 
 | Graph | Colored |
 | ----- | ------- |
@@ -8,25 +8,32 @@ This is an implementation of graph coloring problem.
 
 ## Build
 
+[`graph_colorization.cpp`](./graph_colorization.cpp) is the main file and contains the implementation. To build a CLI application you need to run the command below:
+
 ```bash
 g++ -std=c++17 graph_colorization.cpp
 ```
 
+Please, pay attention that app requires **C++ 17**. You should use one of the [compilers that support](https://en.cppreference.com/w/cpp/compiler_support/17) the standart.
+
 ## Algorithm
 
-I am using DSatur algorithm to colorize the graph.
+Let me breifly describe the approach used in this project.
 
-Algorithm uses greedy approach by considering the verticies
-in a specific order and assining to them the smallest available color
-not used in the local neighbourhood.
+I am using [DSatur algorithm](https://en.wikipedia.org/wiki/DSatur) by Daniel Brélaz to colorize the graph.
+DSatur is a heuristic greedy graph colouring algorithm.
 
-The ordering of the consideration relies on an heuristic:
-the ordering is built dynamically choosing next the vertex adjacent to
-the largest number of different colors.
+As any greedy approach it is considering the verticies
+in a specific order assigning to them the smallest possible color.
+
+To do so the algorithm is dynamically (i.e. at every step) choosing the next vertex by picking a vertex
+the largest number of different colors among the vertices adjacent to the one under consideration.
+Once the vertex has been coloured, the algorithm considers ramining uncolored vertices. If there is a tie
+between a few vertices the next step is to consider their degree in uncolored subgraph.
 
 ## Output
 
-Program report can be found in [`output_report.csv`](./output_report.csv)
+The output of one program run can be found in **below** or in [`output_report.csv`](./output_report.csv).
 
 ```bash
             Instance    Colors      Time, sec
@@ -51,32 +58,32 @@ Program report can be found in [`output_report.csv`](./output_report.csv)
         queen5_5.col         5              0
 ```
 
-If you're interested in visualising colors or just want to validate the output
-you can take a look at [`colors_report.txt`](./colors_report.txt). This file contains all
-colors that have been assigned to the vertices.
-
-The ordering of a color label is an id of the vertex in the list.
+If you're interested in visualising colors you can take a look 
+at [`colors_report.txt`](./colors_report.txt). This file contains all
+colors that have been assigned to the vertices in order of their appearance in
+a file containing the graph.
 
 ## Misc
 
-### Changes to original code
+### Changes to the template
 
-I modififed `Check` method. Instead of considering `0` as no color, I am considering
-`kColorNoColor = -1` as I am using colors as an index in other arrays in the algorithm
-and it is more convenient to use them this way.
+The most significant change made to the original template is the `Check` method. 
+Instead of considering `0` as **not a color**, I am considering `kColorNoColor = -1`.
+I am using colors as an index in other arrays, therefore indexing them from `0` seems
+more convenient.
 
 ### Visualisation
 
-In order to visualise graph I did a small script.
-You can find the script at [graph_visualisation.py](./graph_visualisation.py).
+Additionally to the `Check` method I prepared a small Python script
+to visualise graphs. You can find the script at [graph_visualisation.py](./graph_visualisation.py).
 
-To run the script:
+You need [streamlit](https://pypi.org/project/streamlit/) and [steamlit_agraph](https://pypi.org/project/streamlit-agraph/) installed. To run visualisation script use the command below:
 
 ```bash
 streamlit run graph_visualisation.py
 ```
 
-You will see the interface like the interface below:
+If you see the interface like the interface below the script is running just fine. Hooray 🎉
 
 ![Visualisation interface](./resources/interface.png)
 
@@ -88,3 +95,4 @@ You will see the interface like the interface below:
 |![Graph](./resources/huck.png)|![Colored](./resources/hucked_colored.png)|
 |![Graph](./resources/queen5.png)|![Colored](./resources/queen5_colored.png)|
 
+Thank you for reading!

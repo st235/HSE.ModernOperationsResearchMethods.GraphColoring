@@ -79,9 +79,8 @@ private:
     public:
         bool operator()(const Node& lhs, const Node& rhs) const {
             if (lhs.saturation == rhs.saturation) {
-                // should be strict comparison,
-                // otherwise set won't be able to find an equal element
-
+                // should be strict comparison in all occurences,
+                // otherwise a collection won't be able to find equal elements
                 if (lhs.uncolored_neighborhood_degree == rhs.uncolored_neighborhood_degree) {
                     return lhs.id > rhs.id;
                 }
