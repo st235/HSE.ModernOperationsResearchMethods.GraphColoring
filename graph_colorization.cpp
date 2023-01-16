@@ -42,7 +42,7 @@ std::string ListToString(const std::vector<T>& vector, char delimiter = ' ') {
 class ColoringProblem {
 private:
     static constexpr int32_t kColorNoColor = -1;
-    static constexpr int32_t kColorInitial = 1;
+    static constexpr int32_t kColorInitial = 0;
 
     struct Node {
     public:
@@ -168,7 +168,7 @@ public:
                     available_colors[color] = false;
                 }
             }
-            for (size_t color = 0; color < available_colors.size(); color++) {
+            for (size_t color = kColorInitial; color < available_colors.size(); color++) {
                 if (available_colors[color]) {
                     current_color = color;
                     break;
