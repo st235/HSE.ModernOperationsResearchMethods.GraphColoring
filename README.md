@@ -11,7 +11,7 @@ This is an implementation of [graph coloring](https://en.wikipedia.org/wiki/Grap
 [`graph_colorization.cpp`](./graph_colorization.cpp) is the main file and contains the implementation. To build a CLI application you need to run the command below:
 
 ```bash
-g++ -std=c++17 graph_colorization.cpp
+g++ -std=c++17 -O3 graph_colorization.cpp
 ```
 
 Please, pay attention that app requires **C++ 17**. You should use one of the [compilers that support](https://en.cppreference.com/w/cpp/compiler_support/17) the standart.
@@ -38,23 +38,23 @@ The output of one program run can be found in **below** or in [`output_report.cs
 ```bash
             Instance    Colors      Time, sec
          myciel3.col         4              0
-         myciel7.col         8          0.003
- latin_square_10.col       130          0.383
-         school1.col        17          0.022
-     school1_nsh.col        28          0.016
-      mulsol.i.1.col        49          0.005
-      inithx.i.1.col        54          0.023
-            anna.col        11          0.001
+         myciel7.col         8          0.001
+ latin_square_10.col       130          0.141
+         school1.col        17          0.007
+     school1_nsh.col        28          0.005
+      mulsol.i.1.col        49          0.001
+      inithx.i.1.col        54          0.007
+            anna.col        11              0
             huck.col        11              0
             jean.col        10              0
-       miles1000.col        42          0.004
-       miles1500.col        73          0.007
-      fpsol2.i.1.col        65          0.015
-        le450_5a.col        10          0.007
-       le450_15b.col        17           0.01
-       le450_25a.col        25           0.01
-        games120.col         9          0.001
-      queen11_11.col        14          0.002
+       miles1000.col        42          0.001
+       miles1500.col        73          0.002
+      fpsol2.i.1.col        65          0.004
+        le450_5a.col        10          0.002
+       le450_15b.col        17          0.003
+       le450_25a.col        25          0.003
+        games120.col         9              0
+      queen11_11.col        14          0.001
         queen5_5.col         5              0
 ```
 
