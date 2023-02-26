@@ -257,7 +257,7 @@ int main() {
         report_file << file << ";"
                       << problem.GetNumberOfColors() << ";"
                       << seconds_diff << ";"
-                      << ConvertToString(problem.GetColors()) << std::endl;
+                      << ConvertToString(problem.GetColors(), ", ") << std::endl;
 
         std::cout << std::setfill(' ') << std::setw(20) << file
                 << std::setfill(' ') << std::setw(10) << problem.GetNumberOfColors()
