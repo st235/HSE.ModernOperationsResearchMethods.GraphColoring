@@ -20,11 +20,15 @@ double RoundTo(double value, double precision = 1.0) {
 }
 
 template<typename T>
-std::string ListToString(const std::vector<T>& vector, char delimiter = ' ') {
+std::string ConvertToString(
+        const std::vector<T>& collection,
+        const std::string& delimiter = " ") {
     std::ostringstream os;
-    for (const auto& item: vector) {
-        os << item;
-        os << delimiter;
+    for (size_t i = 0; i < collection.size(); i++) {
+        os << collection[i];
+        if (i != collection.size() -1 ) {
+            os << delimiter;
+        }
     }
     return os.str();
 }
@@ -229,10 +233,9 @@ int main() {
         "fpsol2.i.1.col", "le450_5a.col", "le450_15b.col", "le450_25a.col", "games120.col",
         "queen11_11.col", "queen5_5.col" };
 
-    std::ofstream output_report("output_report.csv");
-    std::ofstream colors_report("colors_report.txt");
+    std::ofstream report_file("report.csv");
 
-    output_report << "Instance; Colors; Time (sec)\n";
+    report_file << "Instance; Colors; Time (sec);Color classes" << std::endl;
     std::cout << std::setfill(' ') << std::setw(20) << "Instance" 
               << std::setfill(' ') << std::setw(10) << "Colors"
               << std::setfill(' ') << std::setw(15) << "Time, sec"
@@ -244,20 +247,17 @@ int main() {
         clock_t start = clock();
         problem.GreedyGraphColoring();
         if (!problem.Check()) {
-            output_report << "*** WARNING: incorrect coloring: ***" << std::endl;
+            report_file << "*** WARNING: incorrect coloring: ***" << std::endl;
             std::cout << "*** WARNING: incorrect coloring: ***" << std::endl;
         }
         clock_t end = clock();
         clock_t ticks_diff = end - start;
         double seconds_diff = RoundTo(double(ticks_diff) / CLOCKS_PER_SEC, 0.001);
 
-        colors_report << file << std::endl
-                      << ListToString(problem.GetColors()) << std::endl
-                      << std::endl;
-
-        output_report << file << ";"
+        report_file << file << ";"
                       << problem.GetNumberOfColors() << ";"
-                      << seconds_diff << std::endl;
+                      << seconds_diff << ";"
+                      << ConvertToString(problem.GetColors()) << std::endl;
 
         std::cout << std::setfill(' ') << std::setw(20) << file
                 << std::setfill(' ') << std::setw(10) << problem.GetNumberOfColors()
@@ -265,7 +265,6 @@ int main() {
                 << std::endl;
     }
 
-    colors_report.close();
-    output_report.close();
+    report_file.close();
     return 0;
 }

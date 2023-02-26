@@ -33,7 +33,9 @@ between a few vertices the next step is to consider their degree in uncolored su
 
 ## Output
 
-The output of one program run can be found in **below** or in [`output_report.csv`](./output_report.csv).
+The output of one program run can be found in **below** or in [`report.csv`](./report.csv).
+
+**Please, do pay attention, that `report.csv` also contains the solution!**
 
 ```bash
             Instance    Colors      Time, sec
@@ -74,7 +76,7 @@ more convenient.
 
 ### Visualisation
 
-Additionally to the `Check` method I prepared a small Python script
+Additionally, to the `Check` method I prepared a small Python script
 to visualise graphs. You can find the script at [graph_visualisation.py](./graph_visualisation.py).
 
 You need [streamlit](https://pypi.org/project/streamlit/) and [steamlit_agraph](https://pypi.org/project/streamlit-agraph/) installed. To run visualisation script use the command below:
