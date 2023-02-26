@@ -2,7 +2,9 @@
 #include <cstdint>
 #include <fstream>
 #include <iomanip>
+#include <iomanip>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <set>
 #include <sstream>
